@@ -4,6 +4,7 @@ import router from './router'
 import store from './store'
 import Vant from 'vant'// 引入vant组件库
 import 'vant/lib/index.css'// 引入vant的样式
+import 'amfe-flexible'
 // import { Button } from 'vant' 在项目优化的时候可以这样按需引入，需要哪个组件用哪个
 // Vue.use(Button)
 Vue.config.productionTip = false
