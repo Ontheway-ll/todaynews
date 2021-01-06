@@ -13,7 +13,11 @@ const login = () => import('@/views/login')
 const search = () => import('@/views/search')
 const searchresult = () => import('@/views/search/result')
 const article = () => import('@/views/article')
-
+const originalPush = VueRouter.prototype.push
+VueRouter.prototype.push = function push (location, onResolve, onReject) {
+  if (onResolve || onReject) return originalPush.call(this, location, onResolve, onReject)
+  return originalPush.call(this, location).catch(err => err)
+}
 const routes = [
   {
     path: '/',
