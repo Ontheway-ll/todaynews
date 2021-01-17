@@ -8,5 +8,13 @@ export default {
     Vue.prototype.$llnotify = (params) => {
       Vue.prototype.$notify({ duration: 800, ...params })
     }
+    Vue.prototype.$sleep = sleep
   }
+}
+// 封装一个休眠函数,返回一个promise,默认是500，如果有传入的时间值就用传入的，
+function sleep (time = 500) {
+  return new Promise(function (resolve, reject) {
+    // 肯定成功执行，有一个延迟
+    setTimeout(() => resolve(), time)
+  })
 }

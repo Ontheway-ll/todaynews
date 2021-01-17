@@ -68,6 +68,8 @@ export default {
   methods: {
     // 下拉刷新
     async onRefresh () {
+      await this.$sleep(1000)
+
       const data = await getArticles({
         channel_id: this.channel_id,
         timestamp: Date.now()// 永远传最新的时间戳
@@ -98,6 +100,7 @@ export default {
       // }, 1000)
     },
     async onload () {
+      await this.$sleep(1000)
       // 上拉加载，1引入请求,传入参数
       const data = await getArticles({
         channel_id: this.channel_id,
