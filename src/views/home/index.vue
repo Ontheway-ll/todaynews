@@ -1,13 +1,15 @@
 <template>
   <div class="container">
     <van-tabs>
-      <van-tab :title="`标签${item}`" v-for="item in 10 " :key="item">
+      <van-tab :title="item.name" v-for="item in channels " :key="item.id">
         <!-- <div class="scroll-wrapper">
           <van-cell-group>
             <van-cell title="单元格" value="内容" v-for="item in 20" :key="item" />
           </van-cell-group>
         </div> -->
-        <ArticleList></ArticleList>
+
+        <!-- 频道id传递给articles-list，父传子props -->
+        <ArticleList :channel_id="item.id" ></ArticleList>
       </van-tab>
     </van-tabs>
     <span class="bar_btn">
@@ -18,10 +20,25 @@
 
 <script>
 import ArticleList from './components/article-list'
+import { getMyChannels } from '@/api/channels'
 export default {
   name: 'container',
   components: {
     ArticleList
+  },
+  data () {
+    return {
+      channels: []// 接收频道的数据
+    }
+  },
+  methods: {
+    async getMyChannels () {
+      const data = await getMyChannels()
+      this.channels = data.channels
+    }
+  },
+  created () {
+    this.getMyChannels()
   }
 }
 </script>

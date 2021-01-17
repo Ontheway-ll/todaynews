@@ -13,22 +13,23 @@
         :finished="finished"
       >
         <van-cell-group>
-          <van-cell v-for="item in articles" :key="item">
+          <!-- art_id是一个大数字的对象，key需要用字符串或者数字代替， -->
+          <van-cell v-for="item in articles" :key="item.art_id.toString()">
             <!-- 三图，无图，多图 -->
             <div class="article_item">
-              <h3 class="van-ellipsis">PullRefresh下拉刷新PullRefresh下拉刷新下拉刷新下拉刷新</h3>
-              <div class="img_box">
-                <van-image class="w33" fit="cover" src="https://img.yzcdn.cn/vant/cat.jpeg" />
-                <van-image class="w33" fit="cover" src="https://img.yzcdn.cn/vant/cat.jpeg" />
-                <van-image class="w33" fit="cover" src="https://img.yzcdn.cn/vant/cat.jpeg" />
+              <h3 class="van-ellipsis">{{item.title}}</h3>
+              <div class="img_box" v-if="item.cover.type===3" >
+                <van-image class="w33" fit="cover" :src="item.cover.images[0]" />
+                <van-image class="w33" fit="cover" :src="item.cover.images[1]" />
+                <van-image class="w33" fit="cover" :src="item.cover.images[2]" />
               </div>
-                <div class="img_box">
-                <van-image class="w100" fit="cover" src="https://img.yzcdn.cn/vant/cat.jpeg" />
+              <div class="img_box" v-if="item.cover.type===1" >
+                <van-image class="w100" fit="cover" :src="item.cover.images[0]" />
               </div>
               <div class="info_box">
-                <span>你像一阵风</span>
-                <span>8评论</span>
-                <span>10分钟前</span>
+                <span>{{item.aut_name}}</span>
+                <span>{{item.comm_count}}评论</span>
+                <span>{{item.pubdate}}</span>
                 <span class="close">
                   <van-icon name="cross"></van-icon>
                 </span>
@@ -42,6 +43,7 @@
 </template>
 
 <script>
+import { getArticles } from '@/api/articles'
 export default {
   data () {
     return {
@@ -50,7 +52,17 @@ export default {
       finished: false,
       articles: [],
       successtext: '',
-      error: false
+      error: false,
+      timestamp: null // 时间戳，定义时间戳对象，存储历史时间戳
+    }
+  },
+  // props: ['channel_id'], //字符串数组的接收方式，比较简单，第一种
+  props: {
+    // key（props属性名）value(对象，配置)
+    channel_id: {
+      required: true, // 必填项，必须传值
+      type: Number, // 传入props属性的类型,不对default约束
+      default: null // 默认，加入你没有传入值，就用默认值,,props里的值
     }
   },
   methods: {
@@ -66,19 +78,33 @@ export default {
         this.successtext = `刷新了${arr.length}数据`
       }, 1000)
     },
-    onload () {
-      console.log('开始加载')
-      if (this.articles.length > 50) {
-        this.finished = true
+    async onload () {
+      // 上拉加载，1引入请求,传入参数
+      const data = await getArticles({
+        channel_id: this.channel_id,
+        timestamp: this.timestamp || Date.now() // 如果有时间戳用时间戳，否则用当前的时间
+      })
+      this.articles.push(...data.results)// 解构出来，resuls是一个数组，push到一个数组，等于是数组套数组，需要解构...
+      this.upLoading = false // 关闭加载状态
+      // 判断时间戳，如果为0，没有内容了fiished为true,
+      if (data.pre_timestamp) {
+        this.timestamp = data.pre_timestamp
       } else {
-        const arr = Array.from(
-          Array(15),
-          (item, index) => this.articles.length + index + 1
-        )
-        this.articles.push(...arr) // ...结构数组
-        // 添加完数据手动关掉loading
-        this.upLoading = false
+        // 没有数据了
+        this.finished = true
       }
+
+      // if (this.articles.length > 50) {
+      //   this.finished = true
+      // } else {
+      //   const arr = Array.from(
+      //     Array(15),
+      //     (item, index) => this.articles.length + index + 1
+      //   )
+      //   this.articles.push(...arr) // ...结构数组
+      //   // 添加完数据手动关掉loading
+      //   this.upLoading = false
+      // }
 
       // setTimeout(() => {
       //   this.finished = true
