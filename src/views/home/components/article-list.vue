@@ -67,16 +67,35 @@ export default {
   },
   methods: {
     // 下拉刷新
-    onRefresh () {
-      setTimeout(() => {
-        const arr = Array.from(
-          Array(2),
-          (value, index) => '追加' + (index + 1)
-        )
-        this.articles.unshift(...arr)
+    async onRefresh () {
+      const data = await getArticles({
+        channel_id: this.channel_id,
+        timestamp: Date.now()// 永远传最新的时间戳
+      })
+      // 请求过来的数据全部替换当前数据，判断如果时间戳没有请求数据来，告诉大家没有新数据
+      // 如果有返回的数据，将整个articles替换
+      if (data.results.length) {
+        this.articles = data.results// 如果有历史时间戳，可以继续拉取
+        // 手动关闭加载状态
         this.downloading = false
-        this.successtext = `刷新了${arr.length}数据`
-      }, 1000)
+        if (data.pre_timestamp) {
+          this.finished = false// 唤醒列表，继续可以上拉加载
+          this.timestamp = data.pre_timestamp// 记录历史时间戳
+        }
+        this.successtext = `更新了${data.results.length}条数据`
+      } else {
+        this.successtext = '当前已经是最新数据'
+      }
+
+      // setTimeout(() => {
+      //   const arr = Array.from(
+      //     Array(2),
+      //     (value, index) => '追加' + (index + 1)
+      //   )
+      //   this.articles.unshift(...arr)
+      //   this.downloading = false
+      //   this.successtext = `刷新了${arr.length}数据`
+      // }, 1000)
     },
     async onload () {
       // 上拉加载，1引入请求,传入参数
