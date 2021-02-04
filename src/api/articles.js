@@ -8,3 +8,19 @@ export function getArticles (params) {
     }
   })
 }
+// 封装不感兴趣的文章接口
+export function unlikeArticle (data) {
+  return request({
+    url: '/article/dislikes',
+    method: 'post',
+    data// body参数位于data
+  })
+}
+// 封装举报文章
+export function reportArticles (data) {
+  return request({
+    url: '/article/reports',
+    data,
+    method: 'post'
+  })
+}
