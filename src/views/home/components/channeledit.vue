@@ -14,8 +14,8 @@
           <!-- <span @click="$emit('seletechannel',item.id)" class="f12">{{item.name}}</span> -->
           <span @click="$emit('seletechannel',index)" :class="{red:activeIndex==index}" class="f12">{{item.name}}</span>
 
-          <!-- 以为第一个永远不显示 -->
-          <van-icon v-if="index !== 0 && editing" class="btn" name="cross"></van-icon>
+          <!-- 以为第一个永远不显示 ,点击叉号删除频道，子传父-->
+          <van-icon @click="$emit('delchannels',item.id)" v-if="index !== 0 && editing" class="btn" name="cross"></van-icon>
         </van-grid-item>
       </van-grid>
     </div>
@@ -25,7 +25,8 @@
       <van-grid class="van-hairline--left">
         <van-grid-item v-for="item in optionschannels" :key="item.id">
           <span  class="f12">{{item.name}}</span>
-          <van-icon  class="btn" name="plus"></van-icon>
+          <!-- 子传父，传出一个频道对象 -->
+          <van-icon @click="$emit('addchannel',item)"  class="btn" name="plus"></van-icon>
         </van-grid-item>
       </van-grid>
     </div>

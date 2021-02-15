@@ -25,8 +25,9 @@
     <!-- 频道弹出面板，编辑组件 -->
     <van-action-sheet v-model="showsheet" title="编辑频道" >
       <!-- 父组件传递，channels -->
-      <channelEdit :activeIndex="activeIndex"  @seletechannel="seletechannel" :channels="channels" ></channelEdit>
+      <channelEdit @addchannel="addChannel" @delchannels="delchannels" :activeIndex="activeIndex"  @seletechannel="seletechannel" :channels="channels" ></channelEdit>
     </van-action-sheet>
+    <!-- <vue-audio :file="file1" /> -->
 
   </div>
 </template>
@@ -34,19 +35,23 @@
 <script>
 import MoveAction from './components/more-action'
 import ArticleList from './components/article-list'
-import { getMyChannels } from '@/api/channels'
+import { getMyChannels, delchannels, addchannels } from '@/api/channels'
 import { unlikeArticle, reportArticles } from '@/api/articles'
 import eventBus from '@/utils/eventbus'
 import channelEdit from './components/channeledit'// 频道编辑组件
+// import VueAudio from 'vue-audio'
+
 export default {
   name: 'container',
   components: {
     ArticleList,
     MoveAction,
     channelEdit
+    // 'vue-audio': VueAudio
   },
   data () {
     return {
+      // file1: require('../../assets/autio.mp3'),
       showsheet: false, // 是否显示面板
       activeIndex: 0, // 激活的索引，van-tabs
       artId: null,
@@ -55,6 +60,25 @@ export default {
     }
   },
   methods: {
+    // 增加频道
+    async addChannel (channel) {
+      await addchannels(channel)// 增加到本地缓存
+      this.channels.push(channel)
+    },
+    // 删除我的频道,接收一个id
+    async delchannels (id) {
+      try {
+        await delchannels(id)// 现在删除的是本地缓存中的频道，当前的频道也要删除
+        const index = this.channels.findIndex(item => item.id === id)
+        // 删除完后对应的activeindex也要变化
+        if (index <= this.activeIndex) {
+          this.activeIndex = this.activeIndex - 1
+        }
+        this.channels.splice(index, 1)
+      } catch (error) {
+        this.$llnotify({ message: '删除频道失败' })
+      }
+    },
     // 点击我的频道进入到当前频道
     // seletechannel (id) {
     //   // 找到当前的索引进行激活
