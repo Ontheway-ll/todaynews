@@ -24,3 +24,17 @@ export function reportArticles (data) {
     method: 'post'
   })
 }
+// 模糊搜索强求
+export function getSuggestion (params) {
+  return request({
+    url: '/suggestion',
+    params// query参数放在params中
+  })
+}
+// 搜索结果页详情
+export function searcharticles (params) {
+  return request({
+    url: '/search',
+    params// 关键词和分页信息
+  })
+}
